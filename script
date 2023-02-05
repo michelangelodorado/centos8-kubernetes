@@ -1,10 +1,69 @@
+hostnamectl set-hostname kubeworker
 cd /etc/yum.repos.d/
 sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
 yum update -y
+
+setenforce 0
+sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+modprobe br_netfilter
+firewall-cmd --add-masquerade --permanent
+firewall-cmd --reload
+
+cat < /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+
+sysctl --system
+
+sudo swapoff -a
+
+
+
+cd /root
+sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+
 adduser kubeadmin
 password="kubeadmin"
 echo "$password" | sudo passwd kubeadmin --stdin
 usermod -aG wheel kubeadmin
 su kubeadmin
 cd /home/kubeadmin/
+
+
+sudo yum remove docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-engine
+
+
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo
+
+
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo systemctl start docker
+
+sudo usermod -aG docker kubeadmin
+#sudo chmod 666 /var/run/docker.sock
+exec newgrp docker
+
+
+docker version
+
+
+
+
+
+
+
