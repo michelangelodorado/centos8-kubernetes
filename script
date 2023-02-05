@@ -1,5 +1,6 @@
 hostname="kubeworker"
-ip="X.X.X.X"
+ip=$(/sbin/ip -o -4 addr list ens192 | awk '{print $4}' | cut -d/ -f1)
+#ip="X.X.X.X"
 
 hostnamectl set-hostname $hostname
 
