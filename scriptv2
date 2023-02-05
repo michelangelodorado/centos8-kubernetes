@@ -26,28 +26,25 @@ EOF
 sysctl --system
 sudo swapoff -a
 
+curl -LO https://github.com/containerd/containerd/releases/download/v1.6.16/containerd-1.6.16-linux-amd64.tar.gz
+tar Cxzvf /usr/local containerd-1.6.16-linux-amd64.tar.gz
 
-###
-sudo yum remove docker \
-docker-client \
-docker-client-latest \
-docker-common \
-docker-latest \
-docker-latest-logrotate \
-docker-logrotate \
-docker-engine
+cat << EOF | sudo tee /etc/systemd/system/containerd.service
+[Unit]
+Description=containerd
+Documentation=https://containerd.io
 
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/containerd
 
-sudo yum install -y yum-utils
-sudo yum-config-manager \
---add-repo \
-https://download.docker.com/linux/centos/docker-ce.repo
+[Install]
+WantedBy=multi-user.target
+EOF
 
+sudo systemctl enable containerd
+sudo systemctl start containerd
 
-sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-sudo systemctl start docker
-
-####
 
 #sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
 
