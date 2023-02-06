@@ -48,21 +48,22 @@ sudo systemctl enable containerd
 sudo systemctl start containerd
 
 
-#systemctl daemon-reload
-#systemctl enable --now containerd
-
-
-
 curl -LO https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.amd64
 install -m 755 runc.amd64 /usr/local/sbin/runc
 
 
 mkdir -p /opt/cni/bin
+curl -LO https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-amd64-v1.2.0.tgz
 tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.2.0.tgz 
 
-#sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+adduser kubeadmin
+password="kubeadmin"
+echo "$password" | sudo passwd kubeadmin --stdin
 
-
+sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+sudo usermod -aG wheel kubeadmin
+su kubeadmin
+cd /home/kubeadmin/
 
 
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -81,13 +82,10 @@ sudo yum update -y
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
 
+sudo kubeadm init
+
+kubectl version
 
 
-adduser kubeadmin
-password="kubeadmin"
-echo "$password" | sudo passwd kubeadmin --stdin
 
-sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
-sudo usermod -aG wheel kubeadmin
-su kubeadmin
-cd /home/kubeadmin/
+
