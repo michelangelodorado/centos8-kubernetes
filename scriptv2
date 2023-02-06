@@ -11,8 +11,7 @@ yum update -y
 setenforce 0
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-modprobe overlay
-modprobe br_netfilter
+
 firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
 systemctl stop firewalld
@@ -25,6 +24,9 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 sysctl --system
 sudo swapoff -a
+
+modprobe overlay
+modprobe br_netfilter
 
 curl -LO https://github.com/containerd/containerd/releases/download/v1.6.16/containerd-1.6.16-linux-amd64.tar.gz
 tar Cxzvf /usr/local containerd-1.6.16-linux-amd64.tar.gz
@@ -46,22 +48,30 @@ sudo systemctl enable containerd
 sudo systemctl start containerd
 
 
+#systemctl daemon-reload
+#systemctl enable --now containerd
+
+
+
+curl -LO https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.amd64
+install -m 755 runc.amd64 /usr/local/sbin/runc
+
+
+mkdir -p /opt/cni/bin
+tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.2.0.tgz 
+
 #sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
 
 adduser kubeadmin
 password="kubeadmin"
 echo "$password" | sudo passwd kubeadmin --stdin
 #usermod -aG wheel kubeadmin
-sudo usermod -aG docker kubeadmin
+#sudo usermod -aG docker kubeadmin
+
+sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
 sudo usermod -aG wheel kubeadmin
-#sudo chmod 666 /var/run/docker.sock
-exec newgrp docker
 su kubeadmin
 cd /home/kubeadmin/
-
-
-docker version
-
 
 
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
