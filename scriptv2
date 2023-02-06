@@ -62,16 +62,7 @@ tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.2.0.tgz
 
 #sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
 
-adduser kubeadmin
-password="kubeadmin"
-echo "$password" | sudo passwd kubeadmin --stdin
-#usermod -aG wheel kubeadmin
-#sudo usermod -aG docker kubeadmin
 
-sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
-sudo usermod -aG wheel kubeadmin
-su kubeadmin
-cd /home/kubeadmin/
 
 
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -89,3 +80,14 @@ EOF
 sudo yum update -y
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
+
+
+
+adduser kubeadmin
+password="kubeadmin"
+echo "$password" | sudo passwd kubeadmin --stdin
+
+sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+sudo usermod -aG wheel kubeadmin
+su kubeadmin
+cd /home/kubeadmin/
