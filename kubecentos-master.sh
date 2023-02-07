@@ -72,5 +72,5 @@ sudo cp -i /etc/kubernetes/admin.conf /home/kubeadmin/.kube/config
 sudo chown $(id -u):$(id -g) /home/kubeadmin/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
 kubeadm token create --print-join-command
-su kubeadmin
 cd /home/kubeadmin/
+su kubeadmin
