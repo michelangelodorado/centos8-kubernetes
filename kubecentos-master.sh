@@ -1,5 +1,7 @@
 #!/bin/bash
-hostname="kubemaster"
+echo Kubemaster Hostname:
+read hostname
+#hostname="kubemaster"
 ip=$(/sbin/ip -o -4 addr list ens192 | awk '{print $4}' | cut -d/ -f1)
 hostnamectl set-hostname $hostname
 sed -i -e '1i'$ip'   '$hostname'\' /etc/hosts
