@@ -67,9 +67,9 @@ wait
 sudo systemctl enable --now kubelet
 sudo kubeadm init
 wait
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p /home/kubeadmin/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/kubeadmin/.kube/config
+sudo chown $(id -u):$(id -g) /home/kubeadmin/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
 kubeadm token create --print-join-command
 su kubeadmin
