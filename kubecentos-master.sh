@@ -62,8 +62,6 @@ password="kubeadmin"
 echo "$password" | sudo passwd kubeadmin --stdin
 sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
 sudo usermod -aG wheel kubeadmin
-su kubeadmin
-cd /home/kubeadmin/
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 wait
 sudo systemctl enable --now kubelet
@@ -74,3 +72,5 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
 kubeadm token create --print-join-command
+su kubeadmin
+cd /home/kubeadmin/
