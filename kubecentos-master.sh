@@ -76,4 +76,5 @@ sudo chown kubeadmin:kubeadmin /home/kubeadmin/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
 kubeadm token create --print-join-command
 cd /home/kubeadmin/
+echo Installation Success! copy the token and paste on the worker nodes
 su kubeadmin
