@@ -76,7 +76,9 @@ mkdir -p /home/$adminaccount/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/$adminaccount/.kube/config
 sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/
 sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/config
+wait
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
+wait
 kubeadm token create --print-join-command
 cd /home/$adminaccount/
 echo Kubernetes Master node Installation Success! copy the token and paste on the worker nodes
