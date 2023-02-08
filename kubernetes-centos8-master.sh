@@ -1,6 +1,10 @@
 #!/bin/bash
 echo Kubemaster Hostname:
 read hostname
+echo Kubernetes Admin Account:
+read adminaccount
+echo Kubernetes Admin Password:
+read adminpassword
 #hostname="kubemaster"
 ip=$(/sbin/ip -o -4 addr list ens192 | awk '{print $4}' | cut -d/ -f1)
 hostnamectl set-hostname $hostname
@@ -59,22 +63,21 @@ mkdir -p /opt/cni/bin
 curl -LO https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-amd64-v1.2.0.tgz
 wait
 tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.2.0.tgz 
-adduser kubeadmin
-password="kubeadmin"
-echo "$password" | sudo passwd kubeadmin --stdin
+adduser $adminaccount
+echo "$adminpassword" | sudo passwd $adminaccount --stdin
 sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
-sudo usermod -aG wheel kubeadmin
+sudo usermod -aG wheel $adminaccount
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 wait
 sudo systemctl enable --now kubelet
 sudo kubeadm init
 wait
-mkdir -p /home/kubeadmin/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/kubeadmin/.kube/config
-sudo chown kubeadmin:kubeadmin /home/kubeadmin/.kube/
-sudo chown kubeadmin:kubeadmin /home/kubeadmin/.kube/config
+mkdir -p /home/$adminaccount/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/$adminaccount/.kube/config
+sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/
+sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico-typha.yaml
 kubeadm token create --print-join-command
-cd /home/kubeadmin/
-echo Installation Success! copy the token and paste on the worker nodes
-su kubeadmin
+cd /home/$adminaccount/
+echo Kubernetes Master node Installation Success! copy the token and paste on the worker nodes
+su $adminaccount
