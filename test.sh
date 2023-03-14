@@ -54,6 +54,7 @@ ExecStart=/usr/local/bin/containerd
 [Install]
 WantedBy=multi-user.target
 EOF
+touch /etc/containerd/config.toml
 cat << EOF | sudo tee /etc/containerd/config.toml
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
   ...
