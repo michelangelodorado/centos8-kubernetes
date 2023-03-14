@@ -78,9 +78,7 @@ sudo cp -i /etc/kubernetes/admin.conf /home/$adminaccount/.kube/config
 sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/
 sudo chown $adminaccount:$adminaccount /home/$adminaccount/.kube/config
 wait
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
-wait
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
 wait
 kubeadm token create --print-join-command
 cd /home/$adminaccount/
