@@ -26,6 +26,7 @@ setenforce 0
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
+systemctl stop firewalld
 systemctl disable firewalld
 cd /root
 cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
