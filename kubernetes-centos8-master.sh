@@ -27,6 +27,7 @@ setenforce 0
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
+systemctl stop firewalld
 systemctl disable firewalld
 cd /root
 cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -70,7 +71,7 @@ sudo usermod -aG wheel $adminaccount
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 wait
 sudo systemctl enable --now kubelet
-sudo kubeadm init
+sudo kubeadm init  --apiserver-advertise-address=10.201.53.70 --pod-network-cidr=192.168.0.0/16
 wait
 mkdir -p /home/$adminaccount/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/$adminaccount/.kube/config
